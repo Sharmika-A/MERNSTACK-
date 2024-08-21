@@ -1,33 +1,68 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Login</title>
-  <link rel="stylesheet" href="styles.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <header>
-    <h1>Login</h1>
-    
-      <ul>
-        <li><a href="home.html">Home</a></li>
-        <li><a href="contact.html">Contact</a></li>
-        <li><a href="gallery.html">Gallery</a></li>
-        <li><a href="login.html">Login</a></li>
-        <li><a href="register.html">Register</a></li>
-      </ul>
-    
-  </header>
-  <main>
-    <form id="loginForm">
-      <label for="email">Email:</label>
-      <input type="email" id="email" name="email" required><br>
-      <label for="password">Password:</label>
-      <input type="password" id="password" name="password" required><br>
-      <button type="submit">Login</button>
-    </form>
-  </main>
-  <script src="app.js"></script>
+    <header>
+        <h1>Login</h1>
+        <nav>
+            <a href="home.html">Home</a>
+            <a href="contact.html">Contact</a>
+            <a href="gallery.html">Gallery</a>
+            <a href="login.html">Login</a>
+            <a href="register.html">Register</a>
+        </nav>
+    </header>
+    <main>
+        <h2>Login to Your Account</h2>
+        <form id="login-form">
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" required>
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" required>
+            <button type="submit">Login</button>
+        </form>
+        <div id="login-message"></div>
+    </main>
+    <script>
+        document.getElementById('login-form').addEventListener('submit', function(e) {
+            e.preventDefault(); // Prevent the default form submission
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            fetch('https://reqres.in/api/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ email, password })
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Login Response:', data);  // Print the response to the console
+
+                if (data.token) {
+                    document.getElementById('login-message').textContent = 'Login successful!';
+                    document.getElementById('login-message').style.color = 'green';
+                    
+                    // Show popup message
+                    alert('Login successfully');
+                    
+                } else {
+                    document.getElementById('login-message').textContent = 'Login failed. Please try again.';
+                    document.getElementById('login-message').style.color = 'red';
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                document.getElementById('login-message').textContent = 'An error occurred. Please try again.';
+                document.getElementById('login-message').style.color = 'red';
+            });
+        });
+    </script>
 </body>
 </html>

@@ -1,6 +1,6 @@
 import { useDispatch, useSelector } from "react-redux"
 
-export default function About(){
+export default function Home(){
     const counterval = useSelector((state)=>state.counter);
     const dispatch = useDispatch();
     const add=()=>{
@@ -18,7 +18,7 @@ export default function About(){
     }
     return(
         <div >
-            <h1>ABOUT</h1> 
+            <h1>HOME</h1> 
             <h1>from Redux  {counterval}</h1>
             <input type="button" value="Add" onClick={add}/>
             <input type="button" value ="Sub" onClick={sub}/>

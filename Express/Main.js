@@ -2,13 +2,23 @@ var express = require("express") // require is like import
 // express is built on functions concept 
 var app = express();
 app.use(express.json()) // middleware function
+const { MongoClient, ObjectId } = require('mongodb');
+// or as an es module:
+// import { MongoClient } from 'mongodb'
+
+// Connection URL
+const url = 'mongodb+srv://anandsharmika2003:NQKVEB6ajqr0XBV3@cluster0.eyxks.mongodb.net/';
+const client = new MongoClient(url);
+
+
+
 
 //call express fn from express library
 app.get("/myname",(req,res)=> {
 res.json({"name":"SHARMIKA A"})
 }); //develope a get api
 
-app.post("/myname",(req,res)=> {
+app.post("/myname",(req,res)=> { 
     res.json({"name":"sharmika"})
     }); //develope a post api  => see in postman that this api is working or not 
 
@@ -72,43 +82,79 @@ app.post("/register",(req,res) => {
             'mobile':body['mobile'],
         
         }
-        
+        const dbname = "office";
          await client.connect();
-            let db = client.db("office");
+            let db = client.db(dbname);
          await db.collection('employee').insertOne(data);
             res.status(200).json({"message":"Created a record"})
             
            
         })
 
-        app.delete("deleteUserByName",async(req,res)=>{
+        app.delete("/deleteUserByName",async(req,res)=>{
             let {name} = req.query;
             await client.connect();
             await
         db.collection("employeee").deleteOne({"name":name})
             res.json({"msg":"user deleted"})
         })
+
+        app.put("/updatepassword",async(req,res)=>{
+            let {name,password} = req.query;
+
+            await
+            db.collection("employee").updateOne({"name":name},{$set:{"password":password}});
+            res.json({"msg":"password update"})
+         })
+
+
+
+
         app.listen(8080,() => {
             console.log("server started");
         })
 
+        app.post("/updatepassword",async(req,res)=>{
+            let {name,password} = req.body;
+
+            await
+            db.collection("employee").updateOne({"name":name},{$set:{"password":password}});
+            res.json({"msg":"password update"})
+         })
+
+
+         var{mongoClient,objectId} = require("mongodb") 
+
+         app.get("/getById",async(req,res)=>{
+            let {id} = req.query; 
+
+        
+        let data = await db.collection("employee").find({"_id":new ObjectId(id)}).toArray();
+
+            res.json(data) 
+         })
+
+         app.post("/createJob",(req,res)=>{
+            var {name,company_name,requirements} = req.body;
+
+            db.collection("jobs").insertOne(
+                {
+                    "name":name,
+                    "company_name":company_name,
+                    "requirements":requirements
+                }
+            )
+                res.json({"msg":"job created"})
+
+          });
+                
 
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+        app.listen(8080,() => {
+            console.log("server started");
+        })
 
 
 

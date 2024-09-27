@@ -9,6 +9,7 @@
   "license": "ISC",
   "dependencies": {
     "express": "^4.20.0",
+    "express-fileupload": "^1.5.1",
     "mongodb": "^6.8.1"
   },
   "description": ""

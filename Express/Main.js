@@ -5,9 +5,13 @@ app.use(express.json()) // middleware function
 const { MongoClient, ObjectId } = require('mongodb');
 // or as an es module:
 // import { MongoClient } from 'mongodb'
-
+ var fileUpload = require("express-fileupload");
+ // limitation for the file upload like size of the file
+app.use(fileUpload({
+    limits: { fileSize: 50 * 1024 * 1024 },
+   }));
 // Connection URL
-const url = 'mongodb+srv://anandsharmika2003:NQKVEB6ajqr0XBV3@cluster0.eyxks.mongodb.net/';
+const url = 'mongodb+srv://anandsharmika2003:sharmi10manju@cluster0.eyxks.mongodb.net/';
 const client = new MongoClient(url);
 
 
@@ -72,97 +76,63 @@ app.post("/register",(req,res) => {
         }
         
         })
-    app.post("/teacher",async(req,res)=>{
-        let body = req.body;
-        let data = {
-            'name':body['name'],
-            'email':body['email'],
-            'password':body['password'],
-            'address':body['address'],
-            'mobile':body['mobile'],
-        
-        }
-        const dbname = "office";
-         await client.connect();
-            let db = client.db(dbname);
-         await db.collection('employee').insertOne(data);
-            res.status(200).json({"message":"Created a record"})
-            
-           
-        })
-
-        app.delete("/deleteUserByName",async(req,res)=>{
-            let {name} = req.query;
-            await client.connect();
-            await
-        db.collection("employeee").deleteOne({"name":name})
-            res.json({"msg":"user deleted"})
-        })
-
-        app.put("/updatepassword",async(req,res)=>{
-            let {name,password} = req.query;
-
-            await
-            db.collection("employee").updateOne({"name":name},{$set:{"password":password}});
-            res.json({"msg":"password update"})
-         })
-
-
-
-
-        app.listen(8080,() => {
-            console.log("server started");
-        })
-
-        app.post("/updatepassword",async(req,res)=>{
-            let {name,password} = req.body;
-
-            await
-            db.collection("employee").updateOne({"name":name},{$set:{"password":password}});
-            res.json({"msg":"password update"})
-         })
-
-
-         var{mongoClient,objectId} = require("mongodb") 
-
-         app.get("/getById",async(req,res)=>{
-            let {id} = req.query; 
-
-        
-        let data = await db.collection("employee").find({"_id":new ObjectId(id)}).toArray();
-
-            res.json(data) 
-         })
-
-         app.post("/createJob",(req,res)=>{
+  
+         app.post("/createJob",(req,res)=>{ 
             var {name,company_name,requirements} = req.body;
 
             db.collection("jobs").insertOne(
                 {
                     "name":name,
                     "company_name":company_name,
-                    "requirements":requirements
+                    "requirements":requirements 
                 }
             )
                 res.json({"msg":"job created"})
 
           });
-                
+          app.post('/upload',function(req,res){
+            let file = req.files.img;
+            let uploadpath = __dirname +'/upload/'  +file.name;
+    
+            file.mv(uploadpath,function(err){
+                if(err)
+                    return res.status(500),send(err);
+                res.send('File uploaded!');
+            })
+        });
+        //login api
+    app.post("/login", async(req,res)=>{
+    let {email,password} = req.body;
+    await client.connect();
+    let db = client.db(dbName); 
+    let loginRes = await db.collection("jobs").find({"email":email,"password":password}).toArray();
+ 
+    if(loginRes.length>0){
+       var token = jwt.sign({ 'name':loginRes[0]['name'] }, 'secret');
+          res.json({"msg":"you are correct","token ": token});
+      }else{
+          res.status(400).json({"msg":"you are wrong"});
+      }
+ })
+       app.use((req,res,next)=>{
+            let {token} = req.headers;
+            if(token == "" || token == undefined){
+                res.json({"msg":"pls send the token"})
+            }else{
+                jwt.verify(token,'SECRET');
+                next();
+            } 
+       });
 
+      
+       
 
-
-
-        app.listen(8080,() => {
-            console.log("server started");
+            app.listen(8080,() => {
+            console.log("server started"); 
         })
 
 
 
 
-// destructuring in javascript old way
-//let user = {"email":"kiki@gmailo.com","pass":"asdfasd"}
 
-//let email = user.email;
-//let pwd = user.pass;
-// new way
-//let{email,pass} = user;
+
